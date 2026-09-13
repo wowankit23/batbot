@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bat Grip Inspection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F3ECDC;
+    --cream-deep: #E8DFC8;
+    --pitch: #1F4D3D;
+    --pitch-dark: #163828;
+    --leather: #8B3A3A;
+    --charcoal: #241F18;
+    --charcoal-soft: #4A443A;
+    --line: #D8CFB4;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  header {
+    background: var(--pitch);
+    color: var(--cream);
+    padding: 40px 20px 32px;
+    margin-bottom: 32px;
+  }
+
+  header .inner {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .crest {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 0.2px;
+    margin: 0 0 8px;
+  }
+
+  header p {
+    margin: 0;
+    color: #CBE0D3;
+    font-size: 15px;
+    max-width: 42ch;
+  }
+
+  section { margin-bottom: 34px; }
+
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--pitch-dark);
+    margin: 0 0 4px;
+  }
+
+  .section-sub {
+    font-size: 13.5px;
+    color: var(--charcoal-soft);
+    margin: 0 0 16px;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .photo-slot {
+    position: relative;
+    aspect-ratio: 1;
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    background: #FBF8F0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+
+  .photo-slot:hover { border-color: var(--pitch); }
+  .photo-slot.filled { border-style: solid; border-color: var(--pitch); }
+  .photo-slot.invalid { border-color: var(--leather); background: #FBF0EE; }
+
+  .photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-slot .plus {
+    width: 26px;
+    height: 26px;
+    color: var(--pitch);
+  }
+
+  .photo-slot .label {
+    font-size: 12.5px;
+    color: var(--charcoal-soft);
+    margin-top: 8px;
+  }
+
+  .photo-slot input { display: none; }
+
+  .photo-warning {
+    grid-column: 1 / -1;
+    background: #FBF0EE;
+    border: 1px solid var(--leather);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--leather);
+  }
+
+  .toggle-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 13px;
+    border-radius: 8px;
+    border: 1.5px solid var(--line);
+    background: #FBF8F0;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .toggle-btn.active-yes {
+    border-color: var(--leather);
+    background: var(--leather);
+    color: white;
+  }
+
+  .toggle-btn.active-no {
+    border-color: var(--pitch);
+    background: var(--pitch);
+    color: white;
+  }
+
+  .cracked-upload { margin-top: 14px; }
+
+  input[type="tel"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--line);
+    background: #FBF8F0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--charcoal);
+  }
+
+  input[type="tel"]:focus {
+    outline: none;
+    border-color: var(--pitch);
+  }
+
+  .hint { font-size: 12.5px; color: var(--charcoal-soft); margin-top: 6px; }
+
+  button.submit {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--pitch);
+    color: white;
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  button.submit:hover { background: var(--pitch-dark); }
+  button.submit:disabled { background: #A9B8AF; cursor: not-allowed; }
+
+  .status {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+
+  .status.show { display: block; }
+  .status.error { background: #FBF0EE; border: 1px solid var(--leather); color: var(--leather); }
+  .status.success { background: #EAF2EC; border: 1px solid var(--pitch); color: var(--pitch-dark); }
+  .status.loading { background: #FBF8F0; border: 1px solid var(--line); color: var(--charcoal-soft); }
+
+  .report-text {
+    white-space: pre-wrap;
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  button.send-report {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--leather);
+    color: white;
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  button.send-report:hover { background: #6E2E2E; }
+  button.send-report:disabled { background: #C9B3AE; cursor: not-allowed; }
+
+  .sent-confirm {
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--pitch-dark);
+    font-weight: 500;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--charcoal-soft);
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <svg class="crest" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="21" y="4" width="6" height="22" rx="3" fill="#CBE0D3"/>
+      <rect x="17" y="24" width="14" height="18" rx="5" fill="#F3ECDC"/>
+      <rect x="19" y="27" width="10" height="2" fill="#1F4D3D"/>
+      <rect x="19" y="31" width="10" height="2" fill="#1F4D3D"/>
+      <rect x="19" y="35" width="10" height="2" fill="#1F4D3D"/>
+    </svg>
+    <h1>Bat Grip Inspection</h1>
+    <p>Upload a few photos of your bat and we'll send a condition report straight to your WhatsApp.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <form id="inspectForm">
+
+    <section>
+      <p class="section-title">Bat photos</p>
+      <p class="section-sub">Add 4 clear photos — front, back, edge, and the full handle.</p>
+      <div class="photo-grid" id="photoGrid">
+        <label class="photo-slot" data-slot="photo1">
+          <svg class="plus" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="label">Front</span>
+          <input type="file" accept="image/*" name="photo1" />
+        </label>
+        <label class="photo-slot" data-slot="photo2">
+          <svg class="plus" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="label">Back</span>
+          <input type="file" accept="image/*" name="photo2" />
+        </label>
+        <label class="photo-slot" data-slot="photo3">
+          <svg class="plus" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="label">Edge</span>
+          <input type="file" accept="image/*" name="photo3" />
+        </label>
+        <label class="photo-slot" data-slot="photo4">
+          <svg class="plus" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="label">Handle</span>
+          <input type="file" accept="image/*" name="photo4" />
+        </label>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-title">Handle condition</p>
+      <p class="section-sub">Is the grip or handle cracked?</p>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn" id="btnYes">Yes, it's cracked</button>
+        <button type="button" class="toggle-btn" id="btnNo">No, it's fine</button>
+      </div>
+
+      <div class="cracked-upload" id="crackedUploadWrap" style="display:none;">
+        <label class="photo-slot" data-slot="crackedPhoto" style="aspect-ratio: 16/9;">
+          <svg class="plus" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="label">Close-up of the crack</span>
+          <input type="file" accept="image/*" name="crackedPhoto" />
+        </label>
+      </div>
+    </section>
+
+    <button type="submit" class="submit" id="submitBtn">Analyze Bat</button>
+
+    <div class="status" id="status"></div>
+  </form>
+
+  <footer>Powered by Gemini AI · Report delivered via WhatsApp</footer>
+</div>
+
+<script>
+  const slots = document.querySelectorAll('.photo-slot');
+  const files = {};
+  let handleCracked = null;
+
+  slots.forEach(slot => {
+    const input = slot.querySelector('input');
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      if (!file) return;
+      files[slot.dataset.slot] = file;
+      slot.classList.remove('invalid');
+      slot.classList.add('filled');
+      const reader = new FileReader();
+      reader.onload = e => {
+        let img = slot.querySelector('img');
+        if (!img) {
+          img = document.createElement('img');
+          slot.innerHTML = '';
+          slot.appendChild(img);
+          slot.appendChild(input);
+        }
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  const btnYes = document.getElementById('btnYes');
+  const btnNo = document.getElementById('btnNo');
+  const crackedWrap = document.getElementById('crackedUploadWrap');
+
+  btnYes.addEventListener('click', () => {
+    handleCracked = true;
+    btnYes.classList.add('active-yes');
+    btnNo.classList.remove('active-no');
+    crackedWrap.style.display = 'block';
+  });
+
+  btnNo.addEventListener('click', () => {
+    handleCracked = false;
+    btnNo.classList.add('active-no');
+    btnYes.classList.remove('active-yes');
+    crackedWrap.style.display = 'none';
+    delete files['crackedPhoto'];
+  });
+
+  const form = document.getElementById('inspectForm');
+  const statusBox = document.getElementById('status');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showStatus(type, html) {
+    statusBox.className = 'status show ' + type;
+    statusBox.innerHTML = html;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    document.querySelectorAll('.photo-slot').forEach(s => s.classList.remove('invalid'));
+
+    const required = ['photo1', 'photo2', 'photo3', 'photo4'];
+    const missing = required.filter(k => !files[k]);
+    if (missing.length > 0) {
+      showStatus('error', 'Please add all 4 bat photos before submitting.');
+      return;
+    }
+    if (handleCracked === null) {
+      showStatus('error', 'Please tell us whether the handle is cracked.');
+      return;
+    }
+    if (handleCracked && !files['crackedPhoto']) {
+      showStatus('error', 'Please upload a close-up photo of the crack.');
+      return;
+    }
+
+    const formData = new FormData();
+    required.forEach(k => formData.append(k, files[k]));
+    if (handleCracked) formData.append('crackedPhoto', files['crackedPhoto']);
+    formData.append('handleCracked', handleCracked ? 'true' : 'false');
+
+    submitBtn.disabled = true;
+    showStatus('loading', 'Analyzing your bat — this takes a few seconds…');
+
+    try {
+      const res = await fetch('/api/inspect', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        if (data.invalidPhotos) {
+          data.invalidPhotos.forEach(p => {
+            const slot = document.querySelector(`[data-slot="photo${p.index}"]`);
+            if (slot) slot.classList.add('invalid');
+          });
+          showStatus('error', 'Some photos don\'t look like a cricket bat — please replace the highlighted ones and try again.');
+        } else {
+          showStatus('error', data.error || 'Something went wrong. Please try again.');
+        }
+        submitBtn.disabled = false;
+        return;
+      }
+
+      showStatus('success',
+        `Report ready:<div class="report-text">${data.report}</div>
+         <button type="button" class="send-report" id="sendReportBtn">Send Report</button>
+         <div class="sent-confirm" id="sentConfirm"></div>`
+      );
+
+      document.getElementById('sendReportBtn').addEventListener('click', async (ev) => {
+        const btn = ev.target;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        const confirmBox = document.getElementById('sentConfirm');
+        try {
+          const sendRes = await fetch('/api/send-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ report: data.report }),
+          });
+          const sendData = await sendRes.json();
+          if (sendRes.ok && sendData.success) {
+            btn.textContent = 'Sent ✓';
+            confirmBox.textContent = 'Report sent on WhatsApp.';
+          } else {
+            btn.disabled = false;
+            btn.textContent = 'Send Report';
+            confirmBox.textContent = sendData.error || 'Could not send the report. Try again.';
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = 'Send Report';
+          confirmBox.textContent = 'Network error — please try again.';
+        }
+      });
+
+      submitBtn.disabled = false;
+    } catch (err) {
+      showStatus('error', 'Network error — please check your connection and try again.');
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
