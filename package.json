@@ -1,0 +1,16 @@
+{
+  "name": "whatsapp-render-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Cloud API webhook server for deployment on Render",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
