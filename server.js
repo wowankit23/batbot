@@ -274,7 +274,7 @@ Respond with ONLY valid JSON, no markdown fences, in exactly this shape:
   const parts = [{ text: prompt }, ...photoParts];
 
   const response = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       contents: [{ parts }],
       generationConfig: { response_mime_type: "application/json" },
