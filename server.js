@@ -255,7 +255,12 @@ app.post("/send-template", async (req, res) => {
 // and (2) write a short condition report covering the grip/handle.
 // ---------------------------------------------------------------------------
 async function analyzeBatWithGemini(photoParts, handleCrackedByUser) {
-  console.log(`🤖 Calling Gemini with ${photoParts.length} image(s). User says handle cracked: ${handleCrackedByUser}`);
+  console.log(`🤖 Preparing Gemini call with ${photoParts.length} image(s). User says handle cracked: ${handleCrackedByUser}`);
+
+  if (!GEMINI_API_KEY) {
+    console.error("❌ GEMINI_API_KEY is missing from environment variables!");
+    throw new Error("GEMINI_API_KEY is not set on the server.");
+  }
 
   const prompt = `You are inspecting photos of a cricket bat for a grip-replacement business.
 You are given ${photoParts.length} photo(s). The first ones are general photos of the bat.
@@ -273,13 +278,21 @@ Respond with ONLY valid JSON, no markdown fences, in exactly this shape:
 
   const parts = [{ text: prompt }, ...photoParts];
 
-  const response = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
+  const modelName = "gemini-flash-latest";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
+  console.log(`🤖 Calling Gemini model: ${modelName}`);
+
+  let response;
+  try {
+    response = await axios.post(url, {
       contents: [{ parts }],
       generationConfig: { response_mime_type: "application/json" },
-    }
-  );
+    });
+  } catch (err) {
+    console.error("❌ Gemini API call failed. Status:", err.response?.status);
+    console.error("❌ Gemini API error body:", JSON.stringify(err.response?.data));
+    throw err;
+  }
 
   const rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
   console.log("🤖 Gemini raw response:", rawText);
